@@ -1,0 +1,6 @@
+*.log
+.idea
+.env
+.eslintrc.json
+.gitignore
+Dockerfile
