@@ -4,6 +4,7 @@ const {createLogger, format, transports} = winston;
 const {combine, timestamp, json, splat, prettyPrint} = format;
 const production = process.env.NODE_ENV === 'production';
 
+
 const logger = createLogger({
   format: combine(
       json(),

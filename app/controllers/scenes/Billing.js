@@ -15,9 +15,7 @@ Billing.enter(async ({i18n, scene, replyWithMarkdown, session}) => {
   );
 });
 
-Billing.action('billing-1', async ({scene, session}) => {
-  console.log(session.orderSum);
-
+Billing.action('billing-1', async ({scene}) => {
   await scene.enter('vin');
 });
 

@@ -1,4 +1,5 @@
-*.json
+orders.db
+config.json
 *.log
 /.idea/
 /node_modules/
