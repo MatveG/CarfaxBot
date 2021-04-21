@@ -16,15 +16,15 @@ Billing.enter(async ({i18n, scene, replyWithMarkdown, session}) => {
 });
 
 Billing.action('billing-1', async ({scene}) => {
-  await scene.enter('vin');
+  await scene.enter('finish');
 });
 
 Billing.action('billing-2', async ({scene}) => {
-  await scene.enter('vin');
+  await scene.enter('finish');
 });
 
 Billing.action('billing-3', async ({scene}) => {
-  await scene.enter('vin');
+  await scene.enter('finish');
 });
 
 export default Billing;

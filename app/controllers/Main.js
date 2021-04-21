@@ -1,7 +1,7 @@
 import telegraf from 'telegraf';
 import languagesKeyboard from './keyboards/languages';
 import BillingScene from './scenes/Billing';
-import CallbackScene from './scenes/Callback';
+import FeedbackScene from './scenes/Feedback';
 import FinishScene from './scenes/Finish';
 import TextScene from './scenes/Text';
 import i18n from '../loaders/i18n';
@@ -10,7 +10,7 @@ const {Stage, Markup} = telegraf;
 
 const Main = new Stage([
   BillingScene,
-  CallbackScene,
+  FeedbackScene,
   FinishScene,
   TextScene,
 ]);
@@ -18,6 +18,10 @@ const Main = new Stage([
 Main.command('start', async ({i18n, scene, replyWithMarkdown}) => {
   await scene.leave();
   await replyWithMarkdown(i18n.t('welcome'), languagesKeyboard(i18n));
+});
+
+Main.command('help', async ({i18n, scene, replyWithMarkdown}) => {
+  await replyWithMarkdown(i18n.t('help'), Markup.removeKeyboard().extra());
 });
 
 Main.command('cancel', async ({i18n, scene, replyWithMarkdown}) => {

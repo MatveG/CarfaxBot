@@ -1,7 +1,9 @@
 orders.db
 config.json
 *.log
+*.pdf
+.env
 /.idea/
+/download/
 /node_modules/
-/.env
 

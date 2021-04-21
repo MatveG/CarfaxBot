@@ -5,15 +5,22 @@ const {BaseScene} = telegraf;
 const Finish = new BaseScene('finish');
 
 Finish.enter(async ({i18n, update, scene, session, replyWithMarkdown}) => {
-  events.emit('orderEvent',
+  events.emit('orderSubmit',
       session.vin,
-      session.orderOption,
-      session.contacts,
+      session.orderOption === 2,
       update.callback_query.from.id,
   );
 
-  await replyWithMarkdown(session.orderOption === 3 ?
-    i18n.t('finish.thanks_premium') : i18n.t('finish.thanks_regular'));
+  if (session.orderOption === 3) {
+    events.emit('feedbackSubmit',
+        session.vin,
+        session.feedback.phone,
+        session.feedback.method,
+    );
+    await replyWithMarkdown(i18n.t('finish.thanks_premium'));
+  } else {
+    await replyWithMarkdown(i18n.t('finish.thanks_regular'));
+  }
 
   await scene.leave();
 });
