@@ -2,10 +2,14 @@ import nodemailer from 'nodemailer';
 import config from '../loaders/config';
 import logger from '../loaders/logger';
 
+const {GMAIL_USER: user, GMAIL_PASS: pass} = process.env;
 const {createTransport} = nodemailer;
 
 export default (subject, text, attachments = []) => {
-  const transporter = createTransport(config.mailer.transporter);
+  const transporter = createTransport({
+    service: 'gmail',
+    auth: {user, pass},
+  });
   const content = {
     ...config.mailer.content,
     subject,
@@ -17,6 +21,6 @@ export default (subject, text, attachments = []) => {
       .sendMail(content)
       .catch((err) => {
         logger.error('Unable to send mail', err);
-        logger.info('Order details: ', {message});
+        logger.info('Order details: ', {text});
       });
 };

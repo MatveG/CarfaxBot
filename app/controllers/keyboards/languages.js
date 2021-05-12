@@ -1,8 +1,8 @@
 import telegraf from 'telegraf';
-import i18n from '../../loaders/i18n';
 
 const {Markup} = telegraf;
 
-export default () => Markup.keyboard([
-  [i18n.t('ru', 'language'), i18n.t('ua', 'language')],
-]).oneTime().resize().extra();
+export default (i18n) => Markup.inlineKeyboard([
+  Markup.callbackButton(i18n.t('language_ru'), 'ru'),
+  Markup.callbackButton(i18n.t('language_ua'), 'ua'),
+]).extra();

@@ -1,0 +1,41 @@
+{
+  "price_1": 25,
+  "price_2": 25,
+  "price_3": 50,
+  "locale": "ru",
+  "dbName": "orders.db",
+  "downloadDir": "./archive",
+  "expirationDays": "30",
+
+  "parser": {
+    "baseUrl": "http://dealer.vin-check.com.ua",
+    "submitPath": "/ajax?action=save_carfax_record&vin=${vin}&comment=${vin}&translate=${translate}",
+    "downloadPath": "/download-file?vin=${vin}&translate=${translate}",
+    "headers": {
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng",
+      "Accept-Encoding": "gzip, deflate",
+      "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36",
+      "Accept-Language": "uk-UA,uk;q=0.8,ru;q=0.6,en-US;q=0.4,en;q=0.2"
+    },
+    "auth": {
+      "service": "login",
+      "stayloggedin": "2678400"
+    }
+  },
+
+  "mailer": {
+    "content": {
+      "from": "CarfaxBot sergey.m.kasyanov@gmail.com",
+      "to": "matvik.net@gmail.com"
+    },
+    "notify": {
+      "subject": "Заявка на расшифровку Carfax",
+      "message": "Номер телефона: ${phone} \nМетод связи: ${method} \nVIN: ${vin}"
+    },
+    "error": {
+      "subject": "Ошибка при парсинге Carfax!",
+      "message": "Ошибка: ${msg}\nПодробности: ${error}"
+    }
+  }
+}
+

@@ -1,9 +1,6 @@
-orders.db
-config.json
+/.idea/
+/node_modules/
 *.log
 *.pdf
+*.db
 .env
-/.idea/
-/download/
-/node_modules/
-

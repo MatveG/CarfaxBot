@@ -5,14 +5,14 @@ const {BaseScene} = telegraf;
 const Finish = new BaseScene('finish');
 
 Finish.enter(async ({i18n, update, scene, session, replyWithMarkdown}) => {
-  events.emit('orderSubmit',
+  events.emit('submitOrder',
       session.vin,
       session.orderOption === 2,
       update.callback_query.from.id,
   );
 
   if (session.orderOption === 3) {
-    events.emit('feedbackSubmit',
+    events.emit('submitFeedback',
         session.vin,
         session.feedback.phone,
         session.feedback.method,

@@ -1,16 +1,19 @@
 {
   "name": "carfax-bot",
-  "version": "1.0.1",
+  "description": "Carfax Telegram bot",
+  "version": "1.0.5",
+  "license": "UNLICENSED",
+  "repository": "no",
   "type": "module",
   "main": "app/index.js",
   "engines": {
     "node": ">=14.x.x"
   },
   "scripts": {
+    "dev": "node --experimental-specifier-resolution=node app/index.js",
+    "start": "NODE_ENV=production node --experimental-specifier-resolution=node app/index.js",
     "test": "node --experimental-vm-modules --experimental-specifier-resolution=node node_modules/jest/bin/jest.js",
-    "test-update": "node --experimental-vm-modules --experimental-specifier-resolution=node node_modules/jest/bin/jest.js -u",
-    "build": "node --experimental-specifier-resolution=node app/index.js",
-    "start": "node --experimental-specifier-resolution=node app/index.js"
+    "test-update": "node --experimental-vm-modules --experimental-specifier-resolution=node node_modules/jest/bin/jest.js -u"
   },
   "jest": {
     "testEnvironment": "node"

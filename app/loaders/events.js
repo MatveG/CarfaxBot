@@ -1,12 +1,12 @@
 import EventEmitter from 'events';
-import feedbackSubmit from '../events/feedbackSubmit';
-import orderSubmit from '../events/orderSubmit';
-import parserError from '../events/parserError';
+import errorParsing from '../events/errorParsing';
+import submitFeedback from '../events/submitFeedback';
+import submitOrder from '../events/submitOrder';
 
 const events = new EventEmitter();
 
-events.on('orderSubmit', orderSubmit);
-events.on('feedbackSubmit', feedbackSubmit);
-events.on('parserError', parserError);
+events.on('errorParsing', errorParsing);
+events.on('submitFeedback', submitFeedback);
+events.on('submitOrder', submitOrder);
 
 export default events;

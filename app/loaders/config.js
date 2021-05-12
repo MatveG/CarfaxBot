@@ -1,17 +1,13 @@
 import fs from 'fs';
-import dotenv from 'dotenv';
+import logger from './logger';
 
-dotenv.config();
-
-const filePath = `./config.json`;
-let config = {};
+let config;
 
 try {
-  const data = fs.readFileSync(filePath, 'utf-8');
-  const string = data.replace(/\${(\w+)\}/gm, (group, symbol) => process.env[symbol]);
-  config = JSON.parse(string);
-} catch (err) {
-  throw err;
+  config = JSON.parse(fs.readFileSync('./config.json', 'utf-8'));
+} catch (error) {
+  logger.error('Error parsing config.json', error);
+  throw error;
 }
 
 export default config;

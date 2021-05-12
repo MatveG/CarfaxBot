@@ -1,68 +1,72 @@
 import fs from 'fs';
 import request from 'request';
-import fullConfig from '../loaders/config';
+import config from '../loaders/config';
+import events from '../loaders/events';
 
-const config = fullConfig.parser;
-
+const {PARSER_USER: username, PARSER_PASS: password} = process.env;
 const jar = request.jar();
 const parser = request.defaults({
   jar,
   method: 'GET',
-  headers: {...config.headers},
+  headers: {...config.parser.headers},
 });
 
 export default class VinParser {
   static submit(vinCode, translate) {
-    const url = config.baseUrl + config.submitPath
-        .replace(/\${vin}/, vinCode)
-        .replace(/\${translate}/, +translate);
+    const url = config.parser.baseUrl + config.parser.submitPath
+        .replace(/\${vin}/g, vinCode)
+        .replace(/\${translate}/g, +translate);
     const options = {url};
 
     return new Promise(async (resolve, reject) => {
-      await this._authorise();
+      try {
+        await this._authorise();
+      } catch (error) {
+        return reject(error);
+      }
 
       parser(options, (error, response, body) => {
         if (error || response.statusCode !== 200) {
+          events.emit('errorParsing', 'Parser failed to make submit request', error);
           return reject(error || new Error('Parser failed to make submit request'));
         }
 
-        if (body.indexOf('"success":false') >= 0) {
-          return resolve(false);
-        }
-
-        resolve(true);
+        return resolve(body.indexOf('"success":true') >= 0);
       });
     });
   };
 
   static download(vinCode, translate) {
-    const url = config.baseUrl + config.downloadPath
-        .replace(/\${vin}/, vinCode)
-        .replace(/\${translate}/, +translate);
+    const url = config.parser.baseUrl + config.parser.downloadPath
+        .replace(/\${vin}/g, vinCode)
+        .replace(/\${translate}/g, +translate);
     const options = {url, headers: {'Accept': 'application/pdf'}};
-    const fileName = `${fullConfig.downloadDir}/${vinCode}.pdf`;
+    const fileName = `${fullConfig.downloadDir}/${vinCode}` + (translate ? '.rus.pdf' : '.pdf');
 
     return new Promise(async (resolve, reject) => {
-      let exists;
-
       try {
         await this._authorise();
-        exists = await this._fileExists(options);
+
+        if (!await this._fileExists(options)) {
+          return resolve(false);
+        }
       } catch (err) {
-        reject(err);
+        return reject(err);
       }
 
-      if (!exists) {
-        return resolve(false);
+      if (!fs.existsSync(config.downloadDir)) {
+        fs.mkdirSync(config.downloadDir);
       }
 
       parser
           .get(options)
-          .on('error', (err) => {
-            reject(err);
+          .on('error', (error) => {
+            events.emit('errorParsing', 'Parser failed to download file', error);
+            reject(error);
           })
           .on('response', function(response) {
             if (response.statusCode !== 200) {
+              events.emit('errorParsing', 'Parser failed to download file', {});
               reject(new Error('Parser failed to download file'));
             }
           })
@@ -75,36 +79,32 @@ export default class VinParser {
 
   static _authorise() {
     const options = {
-      url: config.baseUrl,
+      url: config.parser.baseUrl,
       method: 'POST',
-      form: {...config.auth},
+      form: {...config.parser.auth, username, password},
     };
 
     return new Promise((resolve, reject) => {
       parser(options, (error, response, body) => {
-        if (error || response.statusCode !== 302) {
+        if (error || response.statusCode !== 200) {
+          events.emit('errorParsing', 'Parser failed to authorise', error);
           return reject(error || new Error('Parser failed to authorise'));
         }
 
-        resolve(body);
+        return resolve(body);
       });
     });
   };
 
   static _fileExists(options) {
     return new Promise(async (resolve, reject) => {
-      await this._authorise();
-
       parser(options, (error, response, body) => {
         if (error || (response.statusCode !== 200 && response.statusCode !== 404)) {
+          events.emit('errorParsing', 'Parser failed to check file exists', error);
           return reject(error || Error('Parser failed to check file exists'));
         }
 
-        if (body.indexOf('файл не найден') >= 0) {
-          return resolve(false);
-        }
-
-        resolve(true);
+        return resolve(body.indexOf('файл не найден') === -1);
       });
     });
   }
