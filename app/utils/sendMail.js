@@ -3,13 +3,12 @@ import config from '../loaders/config';
 import logger from '../loaders/logger';
 
 const {GMAIL_USER: user, GMAIL_PASS: pass} = process.env;
-const {createTransport} = nodemailer;
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {user, pass},
+});
 
 export default (subject, text, attachments = []) => {
-  const transporter = createTransport({
-    service: 'gmail',
-    auth: {user, pass},
-  });
   const content = {
     ...config.mailer.content,
     subject,

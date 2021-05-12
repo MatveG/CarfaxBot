@@ -11,9 +11,3 @@ export default (vin, phone, method) => {
 
   sendMail(subject, message);
 };
-
-// const fileFullName = fileName + '.pdf';
-// const attachments = [{
-//   filename: fileFullName,
-//   content: fileBuffer,
-// }];
