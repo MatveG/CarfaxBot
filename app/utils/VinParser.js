@@ -41,7 +41,7 @@ export default class VinParser {
         .replace(/\${vin}/g, vinCode)
         .replace(/\${translate}/g, +translate);
     const options = {url, headers: {'Accept': 'application/pdf'}};
-    const fileName = `${fullConfig.downloadDir}/${vinCode}` + (translate ? '.rus.pdf' : '.pdf');
+    const fileName = `${config.downloadDir}/${vinCode}` + (translate ? '.rus.pdf' : '.pdf');
 
     return new Promise(async (resolve, reject) => {
       try {
@@ -79,8 +79,8 @@ export default class VinParser {
 
   static _authorise() {
     const options = {
-      url: config.parser.baseUrl,
       method: 'POST',
+      url: config.parser.baseUrl,
       form: {...config.parser.auth, username, password},
     };
 

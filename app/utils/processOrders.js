@@ -3,14 +3,14 @@ import logger from '../loaders/logger';
 import VinParser from '../utils/VinParser';
 
 export default () => {
-  nedb.find({submitted: false}, (err, rows) => {
+  nedb.find({submitted: false, downloaded: false}, (err, rows) => {
     if (err) {
       return logger.error('DB error', err);
     }
     rows.forEach(submitRequest);
   });
 
-  nedb.find({downloaded: false}, (err, rows) => {
+  nedb.find({submitted: true, downloaded: false}, (err, rows) => {
     if (err) {
       return logger.error('DB error', err);
     }

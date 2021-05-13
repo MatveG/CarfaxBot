@@ -24,13 +24,17 @@ Main.command('cancel', async ({i18n, scene, replyWithMarkdown}) => {
   await replyWithMarkdown(i18n.t('canceled'));
 });
 
+Main.command('help', async ({i18n, replyWithMarkdown}) => {
+  await replyWithMarkdown(i18n.t('help'));
+});
+
+Main.on('text', async ({scene}) => {
+  await scene.enter('text');
+});
+
 Main.action('leave', async ({i18n, scene, replyWithMarkdown}) => {
   await scene.leave();
   await replyWithMarkdown(i18n.t('canceled'));
-});
-
-Main.command('help', async ({i18n, replyWithMarkdown}) => {
-  await replyWithMarkdown(i18n.t('help'));
 });
 
 Main.action('ru', async ({i18n, replyWithMarkdown}) => {
