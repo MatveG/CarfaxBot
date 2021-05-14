@@ -5,7 +5,7 @@ import FeedbackScene from './scenes/Feedback';
 import FinishScene from './scenes/Finish';
 import TextScene from './scenes/Text';
 
-const {Stage} = telegraf;
+const {Stage, Markup} = telegraf;
 
 const Main = new Stage([
   BillingScene,
@@ -14,22 +14,25 @@ const Main = new Stage([
   TextScene,
 ]);
 
-Main.command('start', async ({i18n, scene, replyWithMarkdown}) => {
-  await scene.leave();
-  await replyWithMarkdown(i18n.t('welcome'), languagesKeyboard(i18n));
-});
+// Main.command('start', async ({i18n, scene, replyWithMarkdown}) => {
+//   await scene.leave();
+//   await replyWithMarkdown(i18n.t('welcome'), languagesKeyboard(i18n));
+// });
+//
+// Main.command('cancel', async ({i18n, scene, replyWithMarkdown}) => {
+//   await scene.leave();
+//   await replyWithMarkdown(i18n.t('canceled'));
+// });
+//
+// Main.command('help', async ({i18n, replyWithMarkdown}) => {
+//   await replyWithMarkdown(i18n.t('help'));
+// });
 
-Main.command('cancel', async ({i18n, scene, replyWithMarkdown}) => {
-  await scene.leave();
-  await replyWithMarkdown(i18n.t('canceled'));
-});
-
-Main.command('help', async ({i18n, replyWithMarkdown}) => {
-  await replyWithMarkdown(i18n.t('help'));
-});
-
-Main.on('text', async ({scene}) => {
-  await scene.enter('text');
+Main.on('text', async ({scene, reply}) => {
+  // await scene.enter('text');
+  await reply('test', Markup.inlineKeyboard([
+    Markup.urlButton('text', 'www.google.com.ua'),
+  ]).extra());
 });
 
 Main.action('leave', async ({i18n, scene, replyWithMarkdown}) => {

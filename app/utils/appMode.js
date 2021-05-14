@@ -5,7 +5,19 @@ import config from '../loaders/config';
 export function prodMode() {
   const server = express();
 
-  server.get('/healthcare', (request, response) => response.send('ok'));
+  console.log('prodMode');
+
+  server.post(config.merchant.create.serviceUrl, (request, response) => {
+    // console.log('request', request);
+
+    response.send({
+      orderReference: 'myOrder1',
+      status: 'accept',
+      time: Date.now(),
+      signature: '',
+    });
+  });
+
   server.listen(process.env.PORT || 3000);
 }
 

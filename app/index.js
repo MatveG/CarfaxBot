@@ -4,6 +4,10 @@ import clearExpired from './utils/clearExpired';
 import processOrders from './utils/processOrders';
 import sendReports from './utils/sendReports';
 import {prodMode, devMode} from './utils/appMode';
+import {createInvoice} from './utils/wayForPay';
+
+// const id = (Math.random()*Math.pow(10, 16)).toString();
+// createInvoice('ru', id, 'JM1GJ1W52G1404748', 30).then((res) => console.log(res));
 
 bot.launch().then(() => {
   // Every 30 second

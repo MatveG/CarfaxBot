@@ -1,6 +1,6 @@
 import nedb from '../loaders/nedb';
 import logger from '../loaders/logger';
-import VinParser from '../utils/VinParser';
+import {submitVin, downloadVin} from './vinParser';
 
 export default () => {
   nedb.find({submitted: false, downloaded: false}, (err, rows) => {
@@ -20,7 +20,7 @@ export default () => {
 
 async function submitRequest({_id, vin, translate, attempts}) {
   try {
-    if (await VinParser.submit(vin, translate)) {
+    if (await submitVin(vin, translate)) {
       return nedb.update({_id}, {$set: {submitted: true}});
     }
     nedb.update({_id}, {$set: {attempts: attempts + 1}});
@@ -31,7 +31,7 @@ async function submitRequest({_id, vin, translate, attempts}) {
 
 async function downloadRequest({_id, vin, translate, attempts}) {
   try {
-    if (await VinParser.download(vin, translate)) {
+    if (await downloadVin(vin, translate)) {
       return nedb.update({_id}, {$set: {downloaded: true}});
     }
     nedb.update({_id}, {$set: {attempts: attempts + 1}});

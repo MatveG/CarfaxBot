@@ -4,6 +4,7 @@
   "price_3": 50,
   "locale": "ru",
   "dbName": "orders.db",
+  "botUrl": "http://167.172.35.46",
   "downloadDir": "./archive",
   "expirationDays": "30",
 
@@ -36,6 +37,18 @@
       "subject": "Ошибка при парсинге Carfax!",
       "message": "Ошибка: ${msg}\nПодробности: ${error}"
     }
+  },
+
+  "merchant": {
+      "transactionType": "CREATE_INVOICE",
+      "merchantAccount": "test_merch_n1",
+      "merchantAuthType": "SimpleSignature",
+      "merchantDomainName": "www.super.org",
+      "apiVersion": 1,
+      "serviceUrl": "/wayforpay",
+      "currency": "UAH",
+      "orderTimeout": 86400,
+      "productName": "Проверка Carfax по VIN номеру ${vin}"
   }
 }
 
