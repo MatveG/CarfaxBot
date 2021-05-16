@@ -10,7 +10,7 @@ const {PORT, WAYFORPAY_KEY} = process.env;
 const server = express();
 const serviceUrl = `http://localhost:${PORT || 3000}${config.merchant.serviceUrl}`;
 const trueQuery = {
-  merchantAccount: config.merchant.merchantAccount,
+  merchantAccount: config.merchant.query.merchantAccount,
   orderReference: 'myOrder1',
   amount: '30',
   currency: 'UAH',

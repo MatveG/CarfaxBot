@@ -2,7 +2,7 @@ import nock from 'nock';
 import config from '../loaders/config';
 
 export function prodMode() {
-
+  console.log('Production mode');
 }
 
 export function devMode() {

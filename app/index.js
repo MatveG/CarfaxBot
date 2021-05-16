@@ -1,11 +1,11 @@
 import cron from 'node-cron';
 import express from 'express';
 import bot from './loaders/bot';
+import events from './loaders/events';
 import merchant from './routes/merchant';
-import clearExpired from './utils/clearExpired';
-import processOrders from './utils/processOrders';
-import sendReports from './utils/sendReports';
 import {prodMode, devMode} from './utils/appMode';
+import {insertOrder} from './utils/orderActions';
+import {createInvoice} from './utils/wayForPay';
 
 const {PORT, NODE_ENV} = process.env;
 const server = express();
@@ -15,16 +15,23 @@ server.use(merchant);
 server.listen(PORT || 3000);
 
 bot.launch().then(() => {
-  console.log('*-* Bot has been launched *-*');
-
-  // Every 30 second
-  cron.schedule('*/30 * * * * *', sendReports, {});
+  // Every 15 second
+  cron.schedule('*15 * * * * *', () => {
+    events.emit('clearOrders');
+    events.emit('sendReports');
+  }, {});
 
   // Every 1 minute
-  cron.schedule('*/60 * * * * *', processOrders, {});
+  cron.schedule('*/60 * * * * *', () => {
+    events.emit('processOrders');
+  }, {});
 
   // Every day
-  cron.schedule('0 0 0 * * *', clearExpired, {});
+  cron.schedule('0 0 0 * * *', () => {
+    events.emit('cleanDownloads');
+  }, {});
+
+  console.log('*** Bot has been launched ***');
 });
 
 ['SIGINT', 'SIGQUIT', 'SIGTERM'].forEach((sig) => {
@@ -32,4 +39,3 @@ bot.launch().then(() => {
 });
 
 NODE_ENV === 'production' ? prodMode() : devMode();
-

@@ -5,23 +5,44 @@ import logger from '../loaders/logger';
 
 const {WAYFORPAY_KEY} = process.env;
 
-export const createInvoice = (locale, orderId, vinCode, price) => {
+export const createInvoice = async (locale, orderId, vinCode, price) => {
   const query = {
-    ...config.merchant,
+    ...config.merchant.query,
     language: locale,
     orderReference: orderId,
     orderDate: Date.now(),
     amount: price,
-    productName: [config.merchant.productName.replace(/\${vin}/g, vinCode)],
     productPrice: [price],
     productCount: [1],
   };
+  query.productName = [query.productName.replace(/\${vin}/g, vinCode)],
   query.merchantSignature = getRequestSignature(query);
+  let data = {};
 
-  return postToApi(query);
+  try {
+    data = (await axios.post(config.merchant.url, query)).data;
+  } catch (error) {
+    logger.error('Failed to request WayForPay invoice', error);
+  }
+
+  return data.reason === 'Ok' && data.invoiceUrl;
 };
 
 export function getRequestSignature(request) {
+  return crypto.createHmac('md5', WAYFORPAY_KEY).update([
+    request.merchantAccount,
+    request.merchantDomainName,
+    request.orderReference,
+    request.orderDate,
+    request.amount,
+    request.currency,
+    request.productName[0],
+    request.productCount[0],
+    request.productPrice[0],
+  ].join(';')).digest('hex');
+}
+
+export function getSomeSignature(request) {
   return crypto.createHmac('md5', WAYFORPAY_KEY).update([
     request.merchantAccount,
     request.orderReference,
@@ -42,14 +63,3 @@ export function getResponseSignature(response) {
   ].join(';')).digest('hex');
 }
 
-async function postToApi(query) {
-  try {
-    const {data} = await axios.post('https://api.wayforpay.com/api', query);
-
-    if (data.reasonCode === 'Ok') {
-      return data.invoiceUrl;
-    }
-  } catch (error) {
-    logger.error('Failed to create WayForPay invoice', error);
-  }
-}

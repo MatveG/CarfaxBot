@@ -24,6 +24,21 @@
     }
   },
 
+  "merchant": {
+    "url": "https://api.wayforpay.com/api",
+    "serviceUrl": "/wayforpay",
+    "query": {
+      "transactionType": "CREATE_INVOICE",
+      "merchantAccount": "test_merch_n1",
+      "merchantAuthType": "SimpleSignature",
+      "merchantDomainName": "www.super.org",
+      "apiVersion": 1,
+      "currency": "UAH",
+      "orderTimeout": 86400,
+      "productName": "Проверка Carfax по VIN номеру ${vin}"
+    }
+  },
+
   "mailer": {
     "content": {
       "from": "CarfaxBot sergey.m.kasyanov@gmail.com",
@@ -34,21 +49,9 @@
       "message": "Номер телефона: ${phone} \nМетод связи: ${method} \nVIN: ${vin}"
     },
     "error": {
-      "subject": "Ошибка при парсинге Carfax!",
+      "subject": "Ошибка в работе бота!",
       "message": "Ошибка: ${msg}\nПодробности: ${error}"
     }
-  },
-
-  "merchant": {
-      "transactionType": "CREATE_INVOICE",
-      "merchantAccount": "test_merch_n1",
-      "merchantAuthType": "SimpleSignature",
-      "merchantDomainName": "www.super.org",
-      "apiVersion": 1,
-      "serviceUrl": "/wayforpay",
-      "currency": "UAH",
-      "orderTimeout": 86400,
-      "productName": "Проверка Carfax по VIN номеру ${vin}"
   }
 }
 
