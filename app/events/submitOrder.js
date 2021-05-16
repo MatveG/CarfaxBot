@@ -1,13 +1,5 @@
-import nedb from '../loaders/nedb';
+import {insertOrder} from '../utils/orderActions';
 
-export default (vin, translate, chatId) => {
-  nedb.insert({
-    vin,
-    translate,
-    chatId,
-    submitted: false,
-    downloaded: false,
-    attempts: 0,
-    created: Date.now(),
-  });
+export default async (chatId, sum, vin, translate) => {
+  await insertOrder(chatId, sum, vin, translate);
 };

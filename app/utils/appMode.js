@@ -1,24 +1,8 @@
 import nock from 'nock';
-import express from 'express';
 import config from '../loaders/config';
 
 export function prodMode() {
-  const server = express();
 
-  console.log('prodMode');
-
-  server.post(config.merchant.create.serviceUrl, (request, response) => {
-    // console.log('request', request);
-
-    response.send({
-      orderReference: 'myOrder1',
-      status: 'accept',
-      time: Date.now(),
-      signature: '',
-    });
-  });
-
-  server.listen(process.env.PORT || 3000);
 }
 
 export function devMode() {
@@ -31,3 +15,4 @@ export function devMode() {
       .get((uri) => uri.includes('download-file'))
       .replyWithFile(200, './test.pdf');
 }
+

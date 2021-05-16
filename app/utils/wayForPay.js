@@ -4,9 +4,8 @@ import config from '../loaders/config';
 import logger from '../loaders/logger';
 
 const {WAYFORPAY_KEY} = process.env;
-const hasher = crypto.createHmac('md5', WAYFORPAY_KEY);
 
-export const createInvoice = async (locale, orderId, vinCode, price) => {
+export const createInvoice = (locale, orderId, vinCode, price) => {
   const query = {
     ...config.merchant,
     language: locale,
@@ -17,32 +16,40 @@ export const createInvoice = async (locale, orderId, vinCode, price) => {
     productPrice: [price],
     productCount: [1],
   };
+  query.merchantSignature = getRequestSignature(query);
 
-  query.merchantSignature = hasher.update([
-    query.merchantAccount,
-    query.merchantDomainName,
-    query.orderReference,
-    query.orderDate,
-    query.amount,
-    query.currency,
-    query.productName[0],
-    query.productCount[0],
-    query.productPrice[0],
+  return postToApi(query);
+};
+
+export function getRequestSignature(request) {
+  return crypto.createHmac('md5', WAYFORPAY_KEY).update([
+    request.merchantAccount,
+    request.orderReference,
+    request.amount,
+    request.currency,
+    request.authCode,
+    request.cardPan,
+    request.transactionStatus,
+    request.reasonCode,
   ].join(';')).digest('hex');
+}
 
+export function getResponseSignature(response) {
+  return crypto.createHmac('md5', WAYFORPAY_KEY).update([
+    response.orderReference,
+    response.status,
+    response.time,
+  ].join(';')).digest('hex');
+}
+
+async function postToApi(query) {
   try {
     const {data} = await axios.post('https://api.wayforpay.com/api', query);
 
-    if (data.reasonCode === 1100) {
+    if (data.reasonCode === 'Ok') {
       return data.invoiceUrl;
     }
   } catch (error) {
     logger.error('Failed to create WayForPay invoice', error);
   }
-
-  return false;
-};
-
-export const checkInvoice = () => {
-
-};
+}
