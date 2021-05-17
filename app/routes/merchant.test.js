@@ -3,7 +3,7 @@ import crypto from 'crypto';
 import express from 'express';
 import merchant from './merchant';
 import config from '../loaders/config';
-import {getRequestSignature} from '../utils/wayForPay';
+import {getIncomingSignature} from '../utils/wayForPay';
 import {findOrder, insertOrder, removeOrder} from '../utils/orderActions';
 
 const {PORT, WAYFORPAY_KEY} = process.env;
@@ -34,7 +34,7 @@ const falseQuery = {
   ...trueQuery,
   orderReference: '0000000000',
 };
-falseQuery.merchantSignature = getRequestSignature(falseQuery);
+falseQuery.merchantSignature = getIncomingSignature(falseQuery);
 
 describe('Method prodMode', () => {
   let fakeOrderId;
@@ -51,7 +51,7 @@ describe('Method prodMode', () => {
 
     fakeOrderId = await insertOrder(1234567, 30, 'JM1GJ1W11G1234567');
     trueQuery.orderReference = fakeOrderId;
-    trueQuery.merchantSignature = getRequestSignature(trueQuery);
+    trueQuery.merchantSignature = getIncomingSignature(trueQuery);
 
     emptyQueryData = (await axios.post(serviceUrl, {})).data;
     trueQueryData = (await axios.post(serviceUrl, trueQuery)).data;

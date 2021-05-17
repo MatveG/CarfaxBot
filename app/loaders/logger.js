@@ -12,7 +12,7 @@ const logger = createLogger({
       timestamp({format: 'DD-MM-YY HH:mm:ss'}),
   ),
   transports: production ?
-    [new transports.File({filename: 'logger.log', level: 'error'})] :
+    [new transports.File({filename: 'logs.log', level: 'error'})] :
     [new transports.Console({level: 'debug'})],
 });
 

@@ -6,13 +6,17 @@ export default async () => {
   const orders = await selectOrders({});
 
   for (const {_id, chatId, vin, paid, attempts, created, updated} of orders) {
-    if (paid === 0 && Date.now() - created >= 60 * 60 * 1000) {
+    if (paid === false && Date.now() - created >= 60 * 60 * 1000) {
       await removeOrder(_id);
     }
 
-    if (paid === 1 && attempts >= 10 && Date.now() - updated >= 10 * 60 * 1000) {
+    if (paid === true && attempts >= 10 && Date.now() - updated >= 10 * 60 * 1000) {
       await removeOrder(_id);
-      await sendBotMessage(chatId, i18n.t('ru', 'order.error', {vin}));
+      try {
+        await sendBotMessage(chatId, i18n.t('ru', 'order.error', {vin}));
+      } catch (error) {
+        console.error(error);
+      }
     }
   }
 };

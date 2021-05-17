@@ -10,13 +10,17 @@ import {createInvoice} from './utils/wayForPay';
 const {PORT, NODE_ENV} = process.env;
 const server = express();
 
+// insertOrder(12345, 30, '0987654321', false).then((id) => {
+//   createInvoice('ru', id, '0987654321', 30).then((res) => console.log('createInvoice', res));
+// });
+
 server.use(express.json());
 server.use(merchant);
 server.listen(PORT || 3000);
 
 bot.launch().then(() => {
   // Every 15 second
-  cron.schedule('*15 * * * * *', () => {
+  cron.schedule('*/15 * * * * *', () => {
     events.emit('clearOrders');
     events.emit('sendReports');
   }, {});

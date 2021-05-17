@@ -10,7 +10,7 @@
     "node": ">=14.x.x"
   },
   "scripts": {
-    "dev": "node -r dotenv/config --es-module-specifier-resolution=node app/index.js",
+    "dev": "node -r dotenv/config --es-module-specifier-resolution=node --inspect app/index.js",
     "start": "NODE_ENV=production node -r dotenv/config --es-module-specifier-resolution=node app/index.js",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
     "test-update": "node --experimental-vm-modules node_modules/jest/bin/jest.js -u"

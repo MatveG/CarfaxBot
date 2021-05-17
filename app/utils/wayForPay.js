@@ -5,14 +5,14 @@ import logger from '../loaders/logger';
 
 const {WAYFORPAY_KEY} = process.env;
 
-export const createInvoice = async (locale, orderId, vinCode, price) => {
+export const createInvoice = async (locale, orderId, vinCode, sum) => {
   const query = {
     ...config.merchant.query,
     language: locale,
     orderReference: orderId,
     orderDate: Date.now(),
-    amount: price,
-    productPrice: [price],
+    amount: sum,
+    productPrice: [sum],
     productCount: [1],
   };
   query.productName = [query.productName.replace(/\${vin}/g, vinCode)],
@@ -42,7 +42,7 @@ export function getRequestSignature(request) {
   ].join(';')).digest('hex');
 }
 
-export function getSomeSignature(request) {
+export function getIncomingSignature(request) {
   return crypto.createHmac('md5', WAYFORPAY_KEY).update([
     request.merchantAccount,
     request.orderReference,

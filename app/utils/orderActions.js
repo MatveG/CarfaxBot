@@ -19,7 +19,7 @@ export const insertOrder = (chatId, sum, vin, translate = false) => {
     nedb.insert(order, (error, row) => {
       if (error) {
         logger.error('Failed to insert in the DB', error);
-        return resolve(null);
+        return resolve();
       }
       resolve(row._id);
     });
@@ -31,7 +31,7 @@ export const updateOrder = (id, updates) => {
     nedb.update({_id: id}, {$set: updates}, {}, (error, count) => {
       if (error) {
         logger.error('Failed to update the DB', error);
-        return resolve(null);
+        return resolve();
       }
       resolve(count);
     });
@@ -43,7 +43,7 @@ export const removeOrder = (id) => {
     nedb.remove({_id: id}, {}, (error, count) => {
       if (error) {
         logger.error('Failed to remove from the DB', error);
-        return resolve(null);
+        return resolve();
       }
       resolve(count);
     });
@@ -55,7 +55,7 @@ export const findOrder = (id) => {
     nedb.find({_id: id}, (error, rows) => {
       if (error) {
         logger.error('Failed to find in the DB', error);
-        return resolve(null);
+        return resolve();
       }
       resolve(rows[0]);
     });

@@ -1,38 +1,33 @@
 import telegraf from 'telegraf';
 import languagesKeyboard from './keyboards/languages';
 import BillingScene from './scenes/Billing';
-import FeedbackScene from './scenes/Feedback';
-import FinishScene from './scenes/Finish';
+import CallbackScene from './scenes/Callback';
 import TextScene from './scenes/Text';
 
-const {Stage, Markup} = telegraf;
+const {Stage} = telegraf;
 
 const Main = new Stage([
   BillingScene,
-  FeedbackScene,
-  FinishScene,
+  CallbackScene,
   TextScene,
 ]);
 
-// Main.command('start', async ({i18n, scene, replyWithMarkdown}) => {
-//   await scene.leave();
-//   await replyWithMarkdown(i18n.t('welcome'), languagesKeyboard(i18n));
-// });
-//
-// Main.command('cancel', async ({i18n, scene, replyWithMarkdown}) => {
-//   await scene.leave();
-//   await replyWithMarkdown(i18n.t('canceled'));
-// });
-//
-// Main.command('help', async ({i18n, replyWithMarkdown}) => {
-//   await replyWithMarkdown(i18n.t('help'));
-// });
+Main.command('start', async ({i18n, scene, replyWithMarkdown}) => {
+  await scene.leave();
+  await replyWithMarkdown(i18n.t('welcome'), languagesKeyboard(i18n));
+});
 
-Main.on('text', async ({scene, reply}) => {
-  // await scene.enter('text');
-  await reply('test', Markup.inlineKeyboard([
-    Markup.urlButton('text', 'www.google.com.ua'),
-  ]).extra());
+Main.command('cancel', async ({i18n, scene, replyWithMarkdown}) => {
+  await scene.leave();
+  await replyWithMarkdown(i18n.t('canceled'));
+});
+
+Main.command('help', async ({i18n, replyWithMarkdown}) => {
+  await replyWithMarkdown(i18n.t('help'));
+});
+
+Main.on('text', async ({scene}) => {
+  await scene.enter('text');
 });
 
 Main.action('leave', async ({i18n, scene, replyWithMarkdown}) => {

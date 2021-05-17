@@ -29,7 +29,7 @@ Text.action('text-2', async ({scene}) => {
 });
 
 Text.action('text-3', async ({scene}) => {
-  await scene.enter('feedback');
+  await scene.enter('callback');
 });
 
 export default Text;

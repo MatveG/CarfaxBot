@@ -5,7 +5,7 @@ import {selectOrders, updateOrder} from '../utils/orderActions';
 export default async () => {
   const orders = await selectOrders({downloaded: false});
 
-  for (const {vin, translate, submitted, attempts} of orders) {
+  for (const {_id, vin, translate, submitted, attempts} of orders) {
     try {
       if (submitted && await downloadVin(vin, translate)) {
         return await updateOrder(_id, {downloaded: true});
