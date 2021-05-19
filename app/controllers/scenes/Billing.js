@@ -1,30 +1,34 @@
 import telegraf from 'telegraf';
 import config from '../../loaders/config';
-import {createInvoice} from '../../utils/wayForPay';
 import payKeyboard from '../keyboards/billing/pay';
-import {insertOrder} from '../../utils/orderActions';
+import {insertOrder} from '../../utils/ordersDb';
+import {createInvoice} from '../../utils/createInvoice';
 
 const {BaseScene} = telegraf;
 const Billing = new BaseScene('billing');
 
 Billing.enter(async ({i18n, update, scene, replyWithMarkdown, session}) => {
-  session.orderOption = scene.state.orderOption;
-  session.orderSum = config['price_' + scene.state.orderOption];
-
+  const {vin} = session;
   const chatId = update.callback_query.from.id;
-  const orderId = insertOrder(chatId, session.orderSum, session.vin, session.orderOption === 2);
-  const invoiceUrl = await createInvoice(i18n.languageCode, orderId, session.vin, session.orderSum);
+  const orderOption = scene.state.orderOption;
+  const orderSum = config['price_' + scene.state.orderOption];
 
-  debugger;
+  const orderId = await insertOrder(chatId, orderSum, vin, orderOption === 2);
+  const invoiceUrl = await createInvoice(i18n.languageCode, orderId, vin, orderSum);
 
   if (invoiceUrl) {
-    return await replyWithMarkdown(
-        i18n.t(`billing.${session.orderOption === 3 ? 'summary_callback' : 'summary'}`, session),
-        payKeyboard(invoiceUrl),
+    await replyWithMarkdown(
+        i18n.t(
+            `billing.summary${orderOption === 3 ? '_callback' : ''}`,
+            {vin: session.vin, orderSum},
+        ),
+        payKeyboard(i18n, invoiceUrl),
     );
+  } else {
+    await replyWithMarkdown(i18n.t('billing.error'));
   }
 
-  await replyWithMarkdown(i18n.t('billing.error'));
+  await scene.leave();
 });
 
 export default Billing;

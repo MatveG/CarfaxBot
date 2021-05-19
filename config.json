@@ -1,5 +1,5 @@
 {
-  "price_1": 25,
+  "price_1": 1,
   "price_2": 25,
   "price_3": 50,
   "locale": "ru",
@@ -8,28 +8,21 @@
   "downloadDir": "./archive",
   "expirationDays": "30",
 
-  "parser": {
-    "baseUrl": "http://dealer.vin-check.com.ua",
-    "submitPath": "/ajax?action=save_carfax_record&vin=${vin}&comment=${vin}&translate=${translate}",
-    "downloadPath": "/download-file?vin=${vin}&translate=${translate}",
-    "headers": {
-      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng",
-      "Accept-Encoding": "gzip, deflate",
-      "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36",
-      "Accept-Language": "uk-UA,uk;q=0.8,ru;q=0.6,en-US;q=0.4,en;q=0.2"
-    },
-    "auth": {
-      "service": "login",
-      "stayloggedin": "2678400"
+  "carfax": {
+    "apiUrl": "https://api.vin-check.com.ua",
+    "callbackUrl": "/vin-check/?vin=${vin}",
+    "actions": {
+      "add": "/api.php?api_key=${key}&action=add_to_queue&vin=${vin}&translate=${translate}&callback_url=${callback}",
+      "check": "/api.php?api_key=${key}&action=check_report&vin=${vin}&translate=${translate}",
+      "get": "/api.php?api_key=${key}&action=get_report&vin=${vin}&translate=${translate}"
     }
   },
 
   "merchant": {
-    "url": "https://api.wayforpay.com/api",
-    "serviceUrl": "/wayforpay",
+    "apiUrl": "https://api.wayforpay.com/api",
+    "callbackUrl": "/wayforpay",
     "query": {
       "transactionType": "CREATE_INVOICE",
-      "merchantAccount": "test_merch_n1",
       "merchantAuthType": "SimpleSignature",
       "merchantDomainName": "www.super.org",
       "apiVersion": 1,
@@ -51,6 +44,22 @@
     "error": {
       "subject": "Ошибка в работе бота!",
       "message": "Ошибка: ${msg}\nПодробности: ${error}"
+    }
+  },
+
+  "parser": {
+    "baseUrl": "http://dealer.vin-check.com.ua",
+    "submitPath": "/ajax?action=save_carfax_record&vin=${vin}&comment=${vin}&translate=${translate}",
+    "downloadPath": "/download-file?vin=${vin}&translate=${translate}",
+    "headers": {
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng",
+      "Accept-Encoding": "gzip, deflate",
+      "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36",
+      "Accept-Language": "uk-UA,uk;q=0.8,ru;q=0.6,en-US;q=0.4,en;q=0.2"
+    },
+    "auth": {
+      "service": "login",
+      "stayloggedin": "2678400"
     }
   }
 }

@@ -1,15 +1,20 @@
 import nedb from '../loaders/nedb';
 import logger from '../loaders/logger';
 
-export const insertOrder = (chatId, sum, vin, translate = false) => {
+// status:
+// default - 0
+// paid - 1
+// submitted - 2
+// downloaded - 3
+
+export const insertOrder = (chatId, sum, vin, translate = false, contacts = {}) => {
   const order = {
     chatId,
     sum,
     vin,
     translate,
-    paid: false,
-    submitted: false,
-    downloaded: false,
+    contacts,
+    status: 0,
     attempts: 0,
     created: Date.now(),
     updated: Date.now(),

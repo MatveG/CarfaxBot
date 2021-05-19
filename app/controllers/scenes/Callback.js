@@ -17,23 +17,23 @@ Callback.on('text', async ({i18n, update, session, replyWithMarkdown}) => {
     return await replyWithMarkdown(i18n.t('callback.incorrect'));
   }
 
-  session.callback = {phone: msg};
+  session.contacts = {phone: msg};
 
   await replyWithMarkdown(i18n.t('callback.form.method'), optionsKeyboard(i18n));
 });
 
 Callback.action('callback-1', async ({i18n, scene, session}) => {
-  session.callback.method = i18n.t('callback.option_1');
+  session.contacts.method = i18n.t('callback.option_1');
   await scene.enter('billing', orderOptionObj);
 });
 
 Callback.action('callback-2', async ({i18n, scene, session}) => {
-  session.callback.method = i18n.t('callback.option_2');
+  session.contacts.method = i18n.t('callback.option_2');
   await scene.enter('billing', orderOptionObj);
 });
 
 Callback.action('callback-3', async ({i18n, scene, session}) => {
-  session.callback.method = i18n.t('callback.option_3');
+  session.contacts.method = i18n.t('callback.option_3');
   await scene.enter('billing', orderOptionObj);
 });
 

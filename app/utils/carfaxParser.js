@@ -1,7 +1,7 @@
 import fs from 'fs';
 import request from 'request';
 import config from '../loaders/config';
-import events from '../loaders/events';
+import sendMail from './sendMail';
 
 const {PARSER_USER, PARSER_PASS} = process.env;
 const baseUrl = config.parser.baseUrl;
@@ -38,7 +38,7 @@ export const submitVin = (vinCode, translate) => {
 
     parser({url}, (error, response, body) => {
       if (error || response.statusCode !== 200) {
-        events.emit('errorParsing', 'Parser failed to make submit request', error);
+        reportError('Parser failed to make submit request', error);
         return reject(error || new Error('Parser failed to make submit request'));
       }
 
@@ -66,7 +66,7 @@ export const downloadVin = (vinCode, translate) => {
       }
       resolve(false);
     } catch (error) {
-      events.emit('errorParsing', 'Parser failed to download file', error);
+      reportError('Parser failed to download file', error);
       reject(error);
     }
   });
@@ -76,7 +76,7 @@ function authorise() {
   return new Promise((resolve, reject) => {
     parser(authRequest, (error, response, body) => {
       if (error || response.statusCode !== 200) {
-        events.emit('errorParsing', 'Parser failed to authorise', error);
+        reportError('Parser failed to authorise', error);
         return reject(error || new Error('Parser failed to authorise'));
       }
 
@@ -89,7 +89,7 @@ function fileExists(options) {
   return new Promise(async (resolve, reject) => {
     parser(options, (error, response, body) => {
       if (error || (response.statusCode !== 200 && response.statusCode !== 404)) {
-        events.emit('errorParsing', 'Parser failed to check file exists', error);
+        reportError('Parser failed to check file exists', error);
         return reject(error || Error('Parser failed to check file exists'));
       }
 
@@ -97,3 +97,12 @@ function fileExists(options) {
     });
   });
 }
+
+function reportError(errorMsg, errorObj) {
+  const subject = config.mailer.error.subject;
+  const message = config.mailer.error.message
+      .replace(/\${msg}/, String(errorMsg))
+      .replace(/\${error}/, String(errorObj));
+
+  sendMail(subject, message);
+};

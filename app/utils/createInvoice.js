@@ -3,24 +3,27 @@ import crypto from 'crypto';
 import config from '../loaders/config';
 import logger from '../loaders/logger';
 
-const {WAYFORPAY_KEY} = process.env;
+const {WAYFORPAY_USER, WAYFORPAY_KEY} = process.env;
 
 export const createInvoice = async (locale, orderId, vinCode, sum) => {
   const query = {
     ...config.merchant.query,
+    merchantAccount: WAYFORPAY_USER,
     language: locale,
+    serviceUrl: config.botUrl + config.merchant.callbackUrl,
     orderReference: orderId,
     orderDate: Date.now(),
     amount: sum,
     productPrice: [sum],
     productCount: [1],
   };
+  console.log('query', query);
   query.productName = [query.productName.replace(/\${vin}/g, vinCode)],
   query.merchantSignature = getRequestSignature(query);
   let data = {};
 
   try {
-    data = (await axios.post(config.merchant.url, query)).data;
+    data = (await axios.post(config.merchant.apiUrl, query)).data;
   } catch (error) {
     logger.error('Failed to request WayForPay invoice', error);
   }

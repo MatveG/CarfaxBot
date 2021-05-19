@@ -3,14 +3,14 @@ import crypto from 'crypto';
 import express from 'express';
 import merchant from './merchant';
 import config from '../loaders/config';
-import {getIncomingSignature} from '../utils/wayForPay';
-import {findOrder, insertOrder, removeOrder} from '../utils/orderActions';
+import {getIncomingSignature} from '../utils/createInvoice';
+import {findOrder, insertOrder, removeOrder} from '../utils/ordersDb';
 
-const {PORT, WAYFORPAY_KEY} = process.env;
+const {PORT, WAYFORPAY_USER, WAYFORPAY_KEY} = process.env;
 const server = express();
-const serviceUrl = `http://localhost:${PORT || 3000}${config.merchant.serviceUrl}`;
+const callbackUrl = `http://localhost:${PORT || 3000}${config.merchant.callbackUrl}`;
 const trueQuery = {
-  merchantAccount: config.merchant.query.merchantAccount,
+  merchantAccount: WAYFORPAY_USER,
   orderReference: 'myOrder1',
   amount: '30',
   currency: 'UAH',
@@ -25,8 +25,8 @@ const trueQuery = {
   issuerBankName: 'Privatbank',
   recToken: '',
   transactionStatus: 'Approved',
-  reason: '1100',
-  reasonCode: '',
+  reason: 'Ok',
+  reasonCode: '1100',
   fee: '',
   paymentSystem: 'card',
 };
@@ -36,11 +36,9 @@ const falseQuery = {
 };
 falseQuery.merchantSignature = getIncomingSignature(falseQuery);
 
-describe('Method prodMode', () => {
+describe('Route merchant', () => {
   let fakeOrderId;
-  let emptyQueryData;
   let trueQueryData;
-  let falseQueryData;
 
   beforeAll(async () => {
     await new Promise((resolve) => {
@@ -52,17 +50,15 @@ describe('Method prodMode', () => {
     fakeOrderId = await insertOrder(1234567, 30, 'JM1GJ1W11G1234567');
     trueQuery.orderReference = fakeOrderId;
     trueQuery.merchantSignature = getIncomingSignature(trueQuery);
-
-    emptyQueryData = (await axios.post(serviceUrl, {})).data;
-    trueQueryData = (await axios.post(serviceUrl, trueQuery)).data;
-    falseQueryData = (await axios.post(serviceUrl, falseQuery)).data;
+    trueQueryData = (await axios.post(callbackUrl, JSON.stringify(trueQuery))).data;
   });
 
   afterAll(async () => {
     await removeOrder(fakeOrderId);
   });
 
-  it('Should refuse incorrect request', () => {
+  it('Should refuse incorrect request', async () => {
+    const emptyQueryData = (await axios.post(callbackUrl, JSON.stringify({}))).data;
     expect(emptyQueryData).toBeDefined();
     expect(emptyQueryData.status).toBe('refuse');
   });
@@ -94,8 +90,10 @@ describe('Method prodMode', () => {
     expect(trueQueryData.signature).toBe(signature);
   });
 
-  it('Should refuse if order does not exists', () => {
+  it('Should reply accept even if order does not exists', async () => {
+    const falseQueryData = (await axios.post(callbackUrl, JSON.stringify(falseQuery))).data;
+
     expect(falseQueryData).toBeDefined();
-    expect(falseQueryData.status).toBe('refuse');
+    expect(falseQueryData.status).toBe('accept');
   });
 });
