@@ -5,19 +5,18 @@ import logger from '../loaders/logger';
 
 const {WAYFORPAY_USER, WAYFORPAY_KEY} = process.env;
 
-export const createInvoice = async (locale, orderId, vinCode, sum) => {
+export const getInvoice = async (locale, orderId, vinCode, sum) => {
   const query = {
     ...config.merchant.query,
     merchantAccount: WAYFORPAY_USER,
     language: locale,
-    serviceUrl: config.botUrl + config.merchant.callbackUrl,
+    serviceUrl: config.botHost + config.merchant.callbackUrl,
     orderReference: orderId,
     orderDate: Date.now(),
     amount: sum,
     productPrice: [sum],
     productCount: [1],
   };
-  console.log('query', query);
   query.productName = [query.productName.replace(/\${vin}/g, vinCode)],
   query.merchantSignature = getRequestSignature(query);
   let data = {};

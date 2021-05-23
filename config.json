@@ -2,15 +2,17 @@
   "price_1": 1,
   "price_2": 25,
   "price_3": 50,
+  "botHost": "http://167.172.35.46",
   "locale": "ru",
   "dbName": "orders.db",
-  "botUrl": "http://167.172.35.46",
-  "downloadDir": "./archive",
-  "expirationDays": "30",
+  "archive": "./archive",
+  "carfaxExpire": "30",
+  "orderExpire": "1",
 
   "carfax": {
     "apiUrl": "https://api.vin-check.com.ua",
-    "callbackUrl": "/vin-check/?vin=${vin}",
+    "callbackUrl": "/vin-check",
+    "callbackParams":"?vin=${vin}",
     "actions": {
       "add": "/api.php?api_key=${key}&action=add_to_queue&vin=${vin}&translate=${translate}&callback_url=${callback}",
       "check": "/api.php?api_key=${key}&action=check_report&vin=${vin}&translate=${translate}",

@@ -3,16 +3,16 @@ import config from '../loaders/config';
 import logger from '../loaders/logger';
 
 export default () => {
-  if (!fs.existsSync(config.downloadDir)) {
+  if (!fs.existsSync(config.archive)) {
     return false;
   }
 
   try {
-    fs.readdirSync(config.downloadDir).forEach((file) => {
-      const filePath = `${config.downloadDir}/${file}`;
+    fs.readdirSync(config.archive).forEach((file) => {
+      const filePath = `${config.archive}/${file}`;
       const fileAge = (Date.now() - fs.statSync(filePath).mtimeMs)/1000/60/60/30;
 
-      if (fileAge > config.expirationDays) {
+      if (fileAge > config.carfaxExpire) {
         fs.unlinkSync(filePath);
       }
     });

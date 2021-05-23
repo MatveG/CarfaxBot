@@ -22,8 +22,8 @@ const authRequest = {
   },
 };
 
-if (!fs.existsSync(config.downloadDir)) {
-  fs.mkdirSync(config.downloadDir);
+if (!fs.existsSync(config.archive)) {
+  fs.mkdirSync(config.archive);
 }
 
 export const submitVin = (vinCode, translate) => {
@@ -49,7 +49,7 @@ export const submitVin = (vinCode, translate) => {
 
 export const downloadVin = (vinCode, translate) => {
   return new Promise(async (resolve, reject) => {
-    const fileName = `${config.downloadDir}/${vinCode}` + (translate ? '.rus.pdf' : '.pdf');
+    const fileName = `${config.archive}/${vinCode}` + (translate ? '.rus.pdf' : '.pdf');
     const options = {
       url: downloadUrl.replace(/\${vin}/g, vinCode).replace(/\${translate}/g, +translate),
       headers: {'Accept': 'application/pdf'},

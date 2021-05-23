@@ -1,11 +1,12 @@
 import nedb from '../loaders/nedb';
 import logger from '../loaders/logger';
 
-// status:
-// default - 0
-// paid - 1
-// submitted - 2
-// downloaded - 3
+// Order status:
+// 0 - default
+// 1 - paid
+// 2 - submitted
+// 3 - confirmed
+// 4 - downloaded
 
 export const insertOrder = (chatId, sum, vin, translate = false, contacts = {}) => {
   const order = {
@@ -34,6 +35,18 @@ export const insertOrder = (chatId, sum, vin, translate = false, contacts = {}) 
 export const updateOrder = (id, updates) => {
   return new Promise((resolve) => {
     nedb.update({_id: id}, {$set: updates}, {}, (error, count) => {
+      if (error) {
+        logger.error('Failed to update the DB', error);
+        return resolve();
+      }
+      resolve(count);
+    });
+  });
+};
+
+export const updateOrders = (where, updates) => {
+  return new Promise((resolve) => {
+    nedb.update(where, {$set: updates}, {multi: true}, (error, count) => {
       if (error) {
         logger.error('Failed to update the DB', error);
         return resolve();

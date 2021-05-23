@@ -1,55 +1,69 @@
+import fs from 'fs';
 import axios from 'axios';
 import config from '../loaders/config';
 import logger from '../loaders/logger';
-import fs from 'fs';
 
+const {CARFAX_KEY} = process.env;
 axios.defaults.baseURL = config.carfax.apiUrl;
 
-export const submitCarfax = async (vinCode, translate) => {
-  const urlPath = config.carfax.actions.add
-      .replace(/\${vin}/g, vinCode)
-      .replace(/\${translate}/g, +translate);
-
+export const submitCarfax = async (vinCode, translate = false) => {
   try {
-    await axios.get(urlPath);
-    return true;
+    const {data} = await axios.get(getSubmitUrl(vinCode, translate));
+    return data.success || !data.success && Object.keys(data.errors)[0] === '6';
   } catch (error) {
-    logger.error(error);
+    logger.error('Carfax api error', error);
     return false;
   }
 };
 
-export const checkCarfax = async (vinCode, translate) => {
-  const urlPath = config.carfax.actions.check
-      .replace(/\${vin}/g, vinCode)
-      .replace(/\${translate}/g, +translate);
-
+export const checkCarfax = async (vinCode, translate = false) => {
   try {
-    await axios.get(urlPath);
-    return true;
+    const {data} = await axios.get(getCheckUrl(vinCode, translate));
+    return data.success;
   } catch (error) {
-    logger.error(error);
+    logger.error('Carfax api error', error);
     return false;
   }
 };
 
-export const downloadCarfax = async (vinCode, translate) => {
-  const filePath = `${config.downloadDir}/${vinCode}` + (translate ? '.rus.pdf' : '.pdf');
-  const urlPath = config.carfax.actions.get
-      .replace(/\${vin}/g, vinCode)
-      .replace(/\${translate}/g, +translate);
+export const downloadCarfax = async (vinCode, translate = false) => {
+  const filePath = `${config.archive}/${vinCode}` + (translate ? '.rus.pdf' : '.pdf');
 
   try {
-    const response = await axios({
-      url: urlPath,
+    const {data} = await axios({
+      url: getDownloadUrl(vinCode, translate),
       method: 'GET',
       responseType: 'stream',
     });
-
-    await response.data.pipe(fs.createWriteStream(filePath));
-    return true;
+    await data.pipe(fs.createWriteStream(filePath));
+    return fs.existsSync(filePath);
   } catch (error) {
-    logger.error('Failed to download carfax report', error);
+    logger.error('Carfax api error', error);
     return false;
   }
 };
+
+export function getSubmitUrl(vinCode, translate) {
+  const callbackUrl = config.botHost + config.carfax.callbackUrl + config.carfax.callbackParams
+      .replace(/\${vin}/g, vinCode);
+
+  return config.carfax.actions.add
+      .replace(/\${key}/g, CARFAX_KEY)
+      .replace(/\${vin}/g, vinCode)
+      .replace(/\${translate}/g, +translate)
+      .replace(/\${callback}/g, callbackUrl);
+}
+
+export function getCheckUrl(vinCode, translate) {
+  return config.carfax.actions.check
+      .replace(/\${key}/g, CARFAX_KEY)
+      .replace(/\${vin}/g, vinCode)
+      .replace(/\${translate}/g, +translate);
+}
+
+export function getDownloadUrl(vinCode, translate) {
+  return config.carfax.actions.get
+      .replace(/\${key}/g, CARFAX_KEY)
+      .replace(/\${vin}/g, vinCode)
+      .replace(/\${translate}/g, +translate);
+}

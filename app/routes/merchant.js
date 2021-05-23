@@ -1,8 +1,7 @@
 import express from 'express';
 import config from '../loaders/config';
-import events from '../loaders/events';
-import {getIncomingSignature, getResponseSignature} from '../utils/createInvoice';
-import {findOrder, updateOrder} from '../utils/ordersDb';
+import {getIncomingSignature, getResponseSignature} from '../utils/merchantApi';
+import {updateOrder} from '../utils/ordersDB';
 
 // eslint-disable-next-line new-cap
 const router = express.Router();
@@ -10,8 +9,10 @@ router.use(parseBody);
 
 router.post(config.merchant.callbackUrl, async ({body}, response) => {
   const bodyData = JSON.parse(body);
+
+  console.log('Incoming merchant request', bodyData);
+
   const {orderReference, merchantSignature, transactionStatus} = bodyData;
-  const order = await findOrder(orderReference);
   const verified = merchantSignature === getIncomingSignature(bodyData);
   const responseBody = {
     status: verified ? 'accept' : 'refuse',
@@ -20,11 +21,11 @@ router.post(config.merchant.callbackUrl, async ({body}, response) => {
   };
   responseBody.signature = getResponseSignature(responseBody);
 
-  console.log('Incoming request', bodyData);
-
-  if (order && verified) {
-    const {_id} = order;
-    await updateOrder(_id, {paid: transactionStatus === 'Approved', updated: Date.now()});
+  if (verified) {
+    await updateOrder(orderReference, {
+      status: +(transactionStatus === 'Approved'),
+      updated: Date.now(),
+    });
   }
 
   response.send(responseBody);

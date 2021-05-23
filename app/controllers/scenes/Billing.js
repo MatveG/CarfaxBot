@@ -1,8 +1,8 @@
 import telegraf from 'telegraf';
 import config from '../../loaders/config';
 import payKeyboard from '../keyboards/billing/pay';
-import {insertOrder} from '../../utils/ordersDb';
-import {createInvoice} from '../../utils/createInvoice';
+import {insertOrder} from '../../utils/ordersDB';
+import {getInvoice} from '../../utils/merchantApi';
 
 const {BaseScene} = telegraf;
 const Billing = new BaseScene('billing');
@@ -14,7 +14,7 @@ Billing.enter(async ({i18n, update, scene, replyWithMarkdown, session}) => {
   const orderSum = config['price_' + scene.state.orderOption];
 
   const orderId = await insertOrder(chatId, orderSum, vin, orderOption === 2);
-  const invoiceUrl = await createInvoice(i18n.languageCode, orderId, vin, orderSum);
+  const invoiceUrl = await getInvoice(i18n.languageCode, orderId, vin, orderSum);
 
   if (invoiceUrl) {
     await replyWithMarkdown(

@@ -3,8 +3,8 @@ import crypto from 'crypto';
 import express from 'express';
 import merchant from './merchant';
 import config from '../loaders/config';
-import {getIncomingSignature} from '../utils/createInvoice';
-import {findOrder, insertOrder, removeOrder} from '../utils/ordersDb';
+import {getIncomingSignature} from '../utils/merchantApi';
+import {findOrder, insertOrder, removeOrder} from '../utils/ordersDB';
 
 const {PORT, WAYFORPAY_USER, WAYFORPAY_KEY} = process.env;
 const server = express();
@@ -42,7 +42,6 @@ describe('Route merchant', () => {
 
   beforeAll(async () => {
     await new Promise((resolve) => {
-      server.use(express.json());
       server.use(merchant);
       server.listen(PORT || 3000, () => resolve());
     });
@@ -72,11 +71,11 @@ describe('Route merchant', () => {
     expect(trueQueryData.status).toBe('accept');
   });
 
-  it('Should update order paid status', async () => {
+  it('Should change order status to 1', async () => {
     const order = await findOrder(fakeOrderId);
 
-    expect(order.paid).toBeDefined();
-    expect(order.paid).toBe(true);
+    expect(order).toBeDefined();
+    expect(order.status).toBe(1);
   });
 
   it('Should return correct signature', () => {
@@ -90,10 +89,10 @@ describe('Route merchant', () => {
     expect(trueQueryData.signature).toBe(signature);
   });
 
-  it('Should reply accept even if order does not exists', async () => {
+  it('Should refuse if order does not exists', async () => {
     const falseQueryData = (await axios.post(callbackUrl, JSON.stringify(falseQuery))).data;
 
     expect(falseQueryData).toBeDefined();
-    expect(falseQueryData.status).toBe('accept');
+    expect(falseQueryData.status).toBe('refuse');
   });
 });
