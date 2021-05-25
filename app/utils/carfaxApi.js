@@ -35,7 +35,13 @@ export const downloadCarfax = async (vinCode, translate = false) => {
       method: 'GET',
       responseType: 'stream',
     });
-    await data.pipe(fs.createWriteStream(filePath));
+
+    await new Promise((resolve, reject) => {
+      data.pipe(fs.createWriteStream(filePath));
+      data.body.on('error', (err) => reject(err));
+      data.on('finish', resolve);
+    });
+
     return fs.existsSync(filePath);
   } catch (error) {
     logger.error('Carfax api error', error);

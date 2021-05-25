@@ -6,8 +6,10 @@ import fulfillOrders from '../events/fulfillOrders';
 
 const events = new EventEmitter();
 
-events.on('getApiData', async () => await getApiData());
-events.on('fulfillOrders', async () => await fulfillOrders());
+events.on('fulfillOrders', async () => {
+  await getApiData();
+  await fulfillOrders();
+});
 events.on('cleanExpiredArchive', cleanExpiredArchive);
 events.on('cleanExpiredOrders', cleanExpiredOrders);
 

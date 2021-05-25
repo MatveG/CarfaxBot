@@ -14,13 +14,8 @@ server.use(merchant);
 server.listen(PORT || 3000);
 
 bot.launch().then(() => {
-  // Every 15 second
-  cron.schedule('*/15 * * * * *', () => {
-    events.emit('getApiData');
-  }, {});
-
-  // Every 20 second
-  cron.schedule('*/20 * * * * *', () => {
+  // Every 10 second
+  cron.schedule('*/10 * * * * *', () => {
     events.emit('fulfillOrders');
   }, {});
 
