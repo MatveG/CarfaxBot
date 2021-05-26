@@ -11,6 +11,7 @@ export default async () => {
     const shouldBeReady = Date.now() - updated > 3 * 60 * 1000;
 
     if (status === 1 && fs.existsSync(filePath)) {
+      console.log('debugger');
       await updateOrder(_id, {status: 4});
     } else if (status === 1 && await submitCarfax(vin, translate)) {
       await updateOrder(_id, {status: 2});

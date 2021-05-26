@@ -9,9 +9,6 @@ router.use(parseBody);
 
 router.post(config.merchant.callbackUrl, async ({body}, response) => {
   const bodyData = JSON.parse(body);
-
-  console.log('Incoming merchant request', bodyData);
-
   const {orderReference, merchantSignature, transactionStatus} = bodyData;
   const verified = merchantSignature === getIncomingSignature(bodyData);
   const responseBody = {

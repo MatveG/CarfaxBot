@@ -30,6 +30,7 @@ export const downloadCarfax = async (vinCode, translate = false) => {
   const filePath = `${config.archive}/${vinCode}` + (translate ? '.rus.pdf' : '.pdf');
 
   try {
+    const stream = fs.createWriteStream(filePath);
     const {data} = await axios({
       url: getDownloadUrl(vinCode, translate),
       method: 'GET',
@@ -37,9 +38,17 @@ export const downloadCarfax = async (vinCode, translate = false) => {
     });
 
     await new Promise((resolve, reject) => {
-      data.pipe(fs.createWriteStream(filePath));
-      data.body.on('error', (err) => reject(err));
-      data.on('finish', resolve);
+      console.log('Promise');
+
+      data.pipe(stream);
+      stream.on('error', (error) => {
+        reject(error);
+        console.log('error', error);
+      });
+      stream.on('finish', () => {
+        resolve();
+        console.log('resolve');
+      });
     });
 
     return fs.existsSync(filePath);
@@ -50,14 +59,14 @@ export const downloadCarfax = async (vinCode, translate = false) => {
 };
 
 export function getSubmitUrl(vinCode, translate) {
-  const callbackUrl = config.botHost + config.carfax.callbackUrl + config.carfax.callbackParams
-      .replace(/\${vin}/g, vinCode);
+  const callbackUrl = config.botHost + config.carfax.callbackUrl +
+    config.carfax.callbackParams.replace(/\${vin}/g, vinCode);
 
   return config.carfax.actions.add
       .replace(/\${key}/g, CARFAX_KEY)
       .replace(/\${vin}/g, vinCode)
       .replace(/\${translate}/g, +translate)
-      .replace(/\${callback}/g, callbackUrl);
+      .replace(/\${callback}/g, encodeURIComponent(callbackUrl));
 }
 
 export function getCheckUrl(vinCode, translate) {
