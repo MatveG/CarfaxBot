@@ -6,12 +6,11 @@ import {selectOrders, updateOrder} from '../utils/ordersDB';
 export default async () => {
   const orders = await selectOrders({status: {$in: [1, 2, 3]}});
 
-  for (const {_id, status, vin, translate, attempts, updated} of orders) {
+  for (const {_id, status, vin, translate, attempts, paid} of orders) {
     const filePath = `${config.archive}/${vin}.${translate ? 'rus.pdf' : 'pdf'}`;
-    const shouldBeReady = Date.now() - updated > 3 * 60 * 1000;
+    const shouldBeReady = Date.now() - paid > 3 * 60 * 1000;
 
     if (status === 1 && fs.existsSync(filePath)) {
-      console.log('debugger');
       await updateOrder(_id, {status: 4});
     } else if (status === 1 && await submitCarfax(vin, translate)) {
       await updateOrder(_id, {status: 2});

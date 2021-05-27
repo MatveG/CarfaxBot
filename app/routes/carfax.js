@@ -10,7 +10,6 @@ router.get(config.carfax.callbackUrl, async (request, response) => {
 
   if (vin) {
     await updateOrders({vin, status: 2}, {status: 3});
-
     return response.send({success: true});
   }
   response.send({success: false});

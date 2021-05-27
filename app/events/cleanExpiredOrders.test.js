@@ -14,7 +14,7 @@ describe('Event cleanExpiredOrders', () => {
       status: 0,
       attempts: 0,
       created: new Date(Date.now() - (config.orderExpire + 1) * 24*60*60*1000).getTime(),
-      updated: Date.now(),
+      paid: Date.now(),
     };
     const orderId = await new Promise((resolve) => {
       nedb.insert(order, (error, row) => {

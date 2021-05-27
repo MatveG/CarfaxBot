@@ -46,7 +46,7 @@ describe('Route merchant', () => {
       server.listen(PORT || 3000, () => resolve());
     });
 
-    fakeOrderId = await insertOrder(1234567, 30, 'JM1GJ1W11G1234567');
+    fakeOrderId = await insertOrder(1234567, 'ru', 30, 'JM1GJ1W11G1234567');
     trueQuery.orderReference = fakeOrderId;
     trueQuery.merchantSignature = getIncomingSignature(trueQuery);
     trueQueryData = (await axios.post(callbackUrl, JSON.stringify(trueQuery))).data;

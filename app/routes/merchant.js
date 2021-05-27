@@ -1,7 +1,9 @@
 import express from 'express';
 import config from '../loaders/config';
 import {getIncomingSignature, getResponseSignature} from '../utils/merchantApi';
-import {updateOrder} from '../utils/ordersDB';
+import {findOrder, updateOrder} from '../utils/ordersDB';
+import {botSendMessage} from '../utils/botSend';
+import i18n from '../loaders/i18n';
 
 // eslint-disable-next-line new-cap
 const router = express.Router();
@@ -18,11 +20,13 @@ router.post(config.merchant.callbackUrl, async ({body}, response) => {
   };
   responseBody.signature = getResponseSignature(responseBody);
 
-  if (verified) {
-    await updateOrder(orderReference, {
-      status: +(transactionStatus === 'Approved'),
-      updated: Date.now(),
-    });
+  if (verified && transactionStatus === 'Approved') {
+    const order = await findOrder(orderReference);
+
+    if (order) {
+      await updateOrder(order._id, {status: 1, paid: Date.now()});
+      await botSendMessage(order.chatId, i18n.t(order.locale, 'order.paid'));
+    }
   }
 
   response.send(responseBody);

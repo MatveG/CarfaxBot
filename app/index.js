@@ -5,28 +5,31 @@ import events from './loaders/events';
 import carfax from './routes/carfax';
 import merchant from './routes/merchant';
 import {prodMode, devMode} from './utils/appMode';
+import {findOrder} from './utils/ordersDB';
 
 const {PORT, NODE_ENV} = process.env;
 const server = express();
 
-server.use(carfax);
-server.use(merchant);
-server.listen(PORT || 3000);
+findOrder('12345').then((res) => console.log('res', res));
 
-bot.launch().then(() => {
-  // Every 10 second
-  cron.schedule('*/10 * * * * *', () => {
-    events.emit('fulfillOrders');
-  }, {});
+// server.use(carfax);
+// server.use(merchant);
+// server.listen(PORT || 3000);
 
-  // Every day
-  cron.schedule('0 0 0 * * *', () => {
-    events.emit('cleanExpiredOrders');
-    events.emit('cleanExpiredArchive');
-  }, {});
-
-  console.log('[ Bot has been launched ]');
-});
+// bot.launch().then(() => {
+//   // Every 15 seconds
+//   cron.schedule('*/15 * * * * *', () => {
+//     events.emit('processOrders');
+//   }, {});
+//
+//   // Every day
+//   cron.schedule('0 0 0 * * *', () => {
+//     events.emit('cleanExpiredOrders');
+//     events.emit('cleanExpiredArchive');
+//   }, {});
+//
+//   console.log('[ Bot has been launched ]');
+// });
 
 ['SIGINT', 'SIGQUIT', 'SIGTERM'].forEach((sig) => {
   process.on(sig, () => bot.stop());

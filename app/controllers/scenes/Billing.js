@@ -13,15 +13,12 @@ Billing.enter(async ({i18n, update, scene, replyWithMarkdown, session}) => {
   const orderOption = scene.state.orderOption;
   const orderSum = config['price_' + scene.state.orderOption];
 
-  const orderId = await insertOrder(chatId, orderSum, vin, orderOption === 2);
+  const orderId = await insertOrder(chatId, i18n.locale(), orderSum, vin, orderOption === 2);
   const invoiceUrl = await getInvoice(i18n.languageCode, orderId, vin, orderSum);
 
   if (invoiceUrl) {
     await replyWithMarkdown(
-        i18n.t(
-            `billing.summary${orderOption === 3 ? '_callback' : ''}`,
-            {vin: session.vin, orderSum},
-        ),
+        i18n.t('billing.summary', {vin: session.vin, orderSum}),
         payKeyboard(i18n, invoiceUrl),
     );
   } else {

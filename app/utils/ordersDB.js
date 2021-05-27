@@ -8,9 +8,10 @@ import logger from '../loaders/logger';
 // 3 - confirmed
 // 4 - downloaded
 
-export const insertOrder = (chatId, sum, vin, translate = false, contacts = {}) => {
+export const insertOrder = (chatId, locale, sum, vin, translate = false, contacts = {}) => {
   const order = {
     chatId,
+    locale,
     sum,
     vin,
     translate,
@@ -18,7 +19,7 @@ export const insertOrder = (chatId, sum, vin, translate = false, contacts = {}) 
     status: 0,
     attempts: 0,
     created: Date.now(),
-    updated: Date.now(),
+    paid: Date.now(),
   };
 
   return new Promise((resolve) => {

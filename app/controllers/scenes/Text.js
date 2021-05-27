@@ -5,7 +5,7 @@ const {BaseScene} = telegraf;
 const Text = new BaseScene('text');
 const vinRegex = /\b[(A-H|J-N|P|R-Z|0-9)]{17}\b/gm;
 
-Text.enter(async ({i18n, update, session, replyWithMarkdown, scene}) => {
+Text.enter(async ({i18n, update, session, replyWithMarkdown}) => {
   const msg = update.message.text.trim().toUpperCase();
 
   if (!msg.match(vinRegex)) {

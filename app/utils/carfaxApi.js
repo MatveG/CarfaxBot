@@ -9,7 +9,7 @@ axios.defaults.baseURL = config.carfax.apiUrl;
 export const submitCarfax = async (vinCode, translate = false) => {
   try {
     const {data} = await axios.get(getSubmitUrl(vinCode, translate));
-    return data.success || !data.success && Object.keys(data.errors)[0] === '6';
+    return data.success;
   } catch (error) {
     logger.error('Carfax api error', error);
     return false;
@@ -30,25 +30,16 @@ export const downloadCarfax = async (vinCode, translate = false) => {
   const filePath = `${config.archive}/${vinCode}` + (translate ? '.rus.pdf' : '.pdf');
 
   try {
-    const stream = fs.createWriteStream(filePath);
-    const {data} = await axios({
+    const result = await axios({
       url: getDownloadUrl(vinCode, translate),
       method: 'GET',
       responseType: 'stream',
     });
 
     await new Promise((resolve, reject) => {
-      console.log('Promise');
-
-      data.pipe(stream);
-      stream.on('error', (error) => {
-        reject(error);
-        console.log('error', error);
-      });
-      stream.on('finish', () => {
-        resolve();
-        console.log('resolve');
-      });
+      result.data.pipe(fs.createWriteStream(filePath));
+      result.data.on('end', () => resolve(true));
+      result.data.on('error', (error) => reject(error));
     });
 
     return fs.existsSync(filePath);

@@ -18,7 +18,7 @@ describe('Route carfax', () => {
     });
 
     const vinCode = 'JM1GJ1W11G1234567';
-    fakeOrderId = await insertOrder(1234567, 30, 'JM1GJ1W11G1234567');
+    fakeOrderId = await insertOrder(1234567, 'ru', 30, 'JM1GJ1W11G1234567');
     const callbackUrl = `http://localhost:${PORT||3000}${config.carfax.callbackUrl}?vin=${vinCode}`;
 
     await updateOrder(fakeOrderId, {status: 2});

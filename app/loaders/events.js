@@ -6,7 +6,7 @@ import fulfillOrders from '../events/fulfillOrders';
 
 const events = new EventEmitter();
 
-events.on('fulfillOrders', async () => {
+events.on('processOrders', async () => {
   await getApiData();
   await fulfillOrders();
 });

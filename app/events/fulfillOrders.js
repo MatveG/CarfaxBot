@@ -8,11 +8,12 @@ import sendMail from '../utils/sendMail';
 export default async () => {
   const orders = await selectOrders({status: {$gt: 0}});
 
-  for (const {_id, chatId, status, vin, translate, contacts, attempts, updated} of orders) {
+  for (const {_id, chatId, locale, status, vin, translate, contacts, attempts, paid} of orders) {
     const filePath = `${config.archive}/${vin}.${translate ? 'rus.pdf' : 'pdf'}`;
 
     if (status === 4 && fs.existsSync(filePath)) {
       await botSendDocument(chatId, `${vin}.pdf`, filePath);
+      await botSendMessage(chatId, i18n.t(locale, 'order.finish'));
       await removeOrder(_id);
 
       if (Object.keys(contacts).length) {
@@ -21,8 +22,8 @@ export default async () => {
             .replace(/\${method}/, contacts.method),
         );
       }
-    } else if (attempts > 30 && Date.now()-updated > 10*60*1000) {
-      await botSendMessage(chatId, i18n.t('ru', 'order.error', {vin}));
+    } else if (attempts > 40 && Date.now()-paid > 10*60*1000) {
+      await botSendMessage(chatId, i18n.t(locale, 'order.error', {vin}));
       await removeOrder(_id);
     }
   }
