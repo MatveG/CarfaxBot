@@ -2,9 +2,10 @@
   "price_1": 1,
   "price_2": 25,
   "price_3": 50,
-  "botHost": "http://167.172.35.46",
   "locale": "ru",
-  "dbName": "orders.db",
+  "botHost": "http://167.172.35.46",
+  "usersDb": "./db/users.db",
+  "ordersDb": "./db/orders.db",
   "archive": "./archive",
   "carfaxExpire": "30",
   "orderExpire": "1",
@@ -26,7 +27,7 @@
     "query": {
       "transactionType": "CREATE_INVOICE",
       "merchantAuthType": "SimpleSignature",
-      "merchantDomainName": "www.super.org",
+      "merchantDomainName": "t.me/avtosmotr_bot",
       "apiVersion": 1,
       "currency": "UAH",
       "orderTimeout": 86400,
@@ -36,7 +37,7 @@
 
   "mailer": {
     "content": {
-      "from": "CarfaxBot sergey.m.kasyanov@gmail.com",
+      "from": "AvtosmotrBot sergey.m.kasyanov@gmail.com",
       "to": "matvik.net@gmail.com"
     },
     "notify": {

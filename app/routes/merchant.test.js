@@ -4,7 +4,7 @@ import express from 'express';
 import merchant from './merchant';
 import config from '../loaders/config';
 import {getIncomingSignature} from '../utils/merchantApi';
-import {findOrder, insertOrder, removeOrder} from '../utils/ordersDB';
+import {Order, insert, remove, find} from '../utils/nedbOrm';
 
 const {PORT, WAYFORPAY_USER, WAYFORPAY_KEY} = process.env;
 const server = express();
@@ -46,14 +46,15 @@ describe('Route merchant', () => {
       server.listen(PORT || 3000, () => resolve());
     });
 
-    fakeOrderId = await insertOrder(1234567, 'ru', 30, 'JM1GJ1W11G1234567');
+    const fakeOrder = new Order(1234567, 'ru', 30, 'JM1GJ1W11G1234567');
+    fakeOrderId = await insert('orders', fakeOrder);
     trueQuery.orderReference = fakeOrderId;
     trueQuery.merchantSignature = getIncomingSignature(trueQuery);
     trueQueryData = (await axios.post(callbackUrl, JSON.stringify(trueQuery))).data;
   });
 
   afterAll(async () => {
-    await removeOrder(fakeOrderId);
+    await remove('orders', fakeOrderId);
   });
 
   it('Should refuse incorrect request', async () => {
@@ -72,7 +73,7 @@ describe('Route merchant', () => {
   });
 
   it('Should change order status to 1', async () => {
-    const order = await findOrder(fakeOrderId);
+    const order = await find('orders', fakeOrderId);
 
     expect(order).toBeDefined();
     expect(order.status).toBe(1);
@@ -89,10 +90,10 @@ describe('Route merchant', () => {
     expect(trueQueryData.signature).toBe(signature);
   });
 
-  it('Should refuse if order does not exists', async () => {
+  it('Should accept even if order does not exists', async () => {
     const falseQueryData = (await axios.post(callbackUrl, JSON.stringify(falseQuery))).data;
 
     expect(falseQueryData).toBeDefined();
-    expect(falseQueryData.status).toBe('refuse');
+    expect(falseQueryData.status).toBe('accept');
   });
 });

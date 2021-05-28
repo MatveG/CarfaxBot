@@ -5,19 +5,19 @@ const {BaseScene} = telegraf;
 const Text = new BaseScene('text');
 const vinRegex = /\b[(A-H|J-N|P|R-Z|0-9)]{17}\b/gm;
 
-Text.enter(async ({i18n, update, session, replyWithMarkdown}) => {
+Text.enter(async ({i18n, replyWithMarkdown}) => {
+  await replyWithMarkdown(i18n.t('help'));
+});
+
+Text.on('text', async ({i18n, update, session, replyWithMarkdown}) => {
   const msg = update.message.text.trim().toUpperCase();
 
-  if (!msg.match(vinRegex)) {
-    return await replyWithMarkdown(i18n.t('text.incorrect'));
+  if (msg.match(vinRegex)) {
+    session.vin = msg;
+    return await replyWithMarkdown(i18n.t('text.confirm', {vin: msg}), optionsKeyboard(i18n));
   }
 
-  session.vin = msg;
-
-  await replyWithMarkdown(
-      i18n.t('text.confirm', {vin: msg}),
-      optionsKeyboard(i18n),
-  );
+  await replyWithMarkdown(i18n.t('text.incorrect'));
 });
 
 Text.action('text-1', async ({scene}) => {

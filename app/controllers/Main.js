@@ -1,48 +1,48 @@
 import telegraf from 'telegraf';
 import languagesKeyboard from './keyboards/languages';
+import AdminScene from './scenes/Admin';
 import BillingScene from './scenes/Billing';
 import CallbackScene from './scenes/Callback';
+import MailingScene from './scenes/Mailing';
 import TextScene from './scenes/Text';
+import {insert, select, User} from '../utils/nedbOrm';
 
 const {Stage} = telegraf;
 
 const Main = new Stage([
+  AdminScene,
   BillingScene,
   CallbackScene,
+  MailingScene,
   TextScene,
 ]);
 
-Main.command('start', async ({i18n, scene, replyWithMarkdown}) => {
-  await scene.leave();
-  await replyWithMarkdown(i18n.t('welcome'), languagesKeyboard(i18n));
-});
-
-Main.command('cancel', async ({i18n, scene, replyWithMarkdown}) => {
-  await scene.leave();
-  await replyWithMarkdown(i18n.t('canceled'));
-});
-
-Main.command('help', async ({i18n, replyWithMarkdown}) => {
-  await replyWithMarkdown(i18n.t('help'));
-});
-
-Main.on('text', async ({scene}) => {
+Main.action(/ru|ua/g, async ({match, i18n, scene}) => {
+  i18n.locale(match[0]);
   await scene.enter('text');
 });
 
-Main.action('leave', async ({i18n, scene, replyWithMarkdown}) => {
-  await scene.leave();
-  await replyWithMarkdown(i18n.t('canceled'));
+Main.action('leave', cancel);
+
+Main.command('start', async ({i18n, update, replyWithMarkdown}) => {
+  const {id: chatId, username} = update.message.from;
+
+  if (!(await select('users', {chatId})).length) {
+    await insert('users', new User(chatId, username));
+  }
+
+  await replyWithMarkdown(i18n.t('welcome'), languagesKeyboard(i18n));
 });
 
-Main.action('ru', async ({i18n, replyWithMarkdown}) => {
-  i18n.locale('ru');
-  await replyWithMarkdown(i18n.t('help'));
+Main.command('admin', async ({scene}) => {
+  await scene.enter('admin');
 });
 
-Main.action('ua', async ({i18n, replyWithMarkdown}) => {
-  i18n.locale('ua');
-  await replyWithMarkdown(i18n.t('help'));
-});
+Main.command('cancel', cancel);
+
+async function cancel({session, scene}) {
+  session = {};
+  await scene.enter('text');
+}
 
 export default Main;

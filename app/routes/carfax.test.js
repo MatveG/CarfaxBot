@@ -2,7 +2,7 @@ import axios from 'axios';
 import express from 'express';
 import carfax from './carfax';
 import config from '../loaders/config';
-import {findOrder, insertOrder, removeOrder, updateOrder} from '../utils/ordersDB';
+import {Order, insert, update, find, remove} from '../utils/nedbOrm';
 
 const {PORT} = process.env;
 const server = express();
@@ -18,15 +18,16 @@ describe('Route carfax', () => {
     });
 
     const vinCode = 'JM1GJ1W11G1234567';
-    fakeOrderId = await insertOrder(1234567, 'ru', 30, 'JM1GJ1W11G1234567');
+    const fakeOrder = new Order(1234567, 'ru', 30, 'JM1GJ1W11G1234567');
+    fakeOrderId = await insert('orders', fakeOrder);
     const callbackUrl = `http://localhost:${PORT||3000}${config.carfax.callbackUrl}?vin=${vinCode}`;
 
-    await updateOrder(fakeOrderId, {status: 2});
+    await update('orders', {_id: fakeOrderId}, {status: 2});
     queryData = await axios.get(callbackUrl);
   });
 
   afterAll(async () => {
-    await removeOrder(fakeOrderId);
+    await remove('orders', fakeOrderId);
   });
 
   it('Should reply on GET requests', () => {
@@ -36,7 +37,7 @@ describe('Route carfax', () => {
   });
 
   it('Should update orders status', async () => {
-    const order = await findOrder(fakeOrderId);
+    const order = await find('orders', fakeOrderId);
 
     expect(order).toBeDefined();
     expect(order.status).toBe(3);

@@ -1,9 +1,9 @@
 import express from 'express';
 import config from '../loaders/config';
-import {getIncomingSignature, getResponseSignature} from '../utils/merchantApi';
-import {findOrder, updateOrder} from '../utils/ordersDB';
-import {botSendMessage} from '../utils/botSend';
 import i18n from '../loaders/i18n';
+import {getIncomingSignature, getResponseSignature} from '../utils/merchantApi';
+import {sendMessage} from '../utils/sendTelegram';
+import {find, update} from '../utils/nedbOrm';
 
 // eslint-disable-next-line new-cap
 const router = express.Router();
@@ -21,11 +21,11 @@ router.post(config.merchant.callbackUrl, async ({body}, response) => {
   responseBody.signature = getResponseSignature(responseBody);
 
   if (verified && transactionStatus === 'Approved') {
-    const order = await findOrder(orderReference);
+    const order = await find('orders', orderReference);
 
     if (order) {
-      await updateOrder(order._id, {status: 1, paid: Date.now()});
-      await botSendMessage(order.chatId, i18n.t(order.locale, 'order.paid'));
+      await update('orders', {_id: order._id}, {status: 1, paid: Date.now()});
+      await sendMessage(order.chatId, i18n.t(order.locale, 'order.paid'));
     }
   }
 

@@ -1,7 +1,6 @@
 import config from '../loaders/config';
-import nedb from '../loaders/nedb';
 import cleanExpiredOrders from './cleanExpiredOrders';
-import {findOrder} from '../utils/ordersDB';
+import {find, insert} from '../utils/nedbOrm';
 
 describe('Event cleanExpiredOrders', () => {
   it('Should remove Orders created more than 24 hours ago', async () => {
@@ -16,14 +15,10 @@ describe('Event cleanExpiredOrders', () => {
       created: new Date(Date.now() - (config.orderExpire + 1) * 24*60*60*1000).getTime(),
       paid: Date.now(),
     };
-    const orderId = await new Promise((resolve) => {
-      nedb.insert(order, (error, row) => {
-        resolve(row._id);
-      });
-    });
+    const orderId = await insert('orders', order);
 
     await cleanExpiredOrders();
 
-    expect(await findOrder(orderId)).toBe(undefined);
+    expect(await find('orders', orderId)).toBe(undefined);
   });
 });

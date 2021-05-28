@@ -11,6 +11,8 @@ bot.use(session());
 bot.use(i18n.middleware());
 bot.use(MainStage.middleware());
 
+bot.on('text', ({scene}) => scene.enter('text'));
+
 bot.catch((error) => logger.error('Telegraf Error:', error));
 
 export default bot;

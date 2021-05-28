@@ -1,10 +1,12 @@
 import Datastore from 'nedb';
 import config from './config';
 
-const nedb = new Datastore({
-  filename: config.dbName,
-});
+const nedb = {
+  users: new Datastore(config.usersDb),
+  orders: new Datastore(config.ordersDb),
+};
 
-nedb.loadDatabase();
+nedb.users.loadDatabase();
+nedb.orders.loadDatabase();
 
 export default nedb;
