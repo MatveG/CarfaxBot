@@ -17,8 +17,9 @@ const Main = new Stage([
   TextScene,
 ]);
 
-Main.action(/ru|ua/g, async ({match, i18n, scene}) => {
+Main.action(/ru|ua/g, async ({match, i18n, scene, replyWithMarkdown}) => {
   i18n.locale(match[0]);
+  await replyWithMarkdown(i18n.t('help'));
   await scene.enter('text');
 });
 
@@ -40,9 +41,10 @@ Main.command('admin', async ({scene}) => {
 
 Main.command('cancel', cancel);
 
-async function cancel({session, scene}) {
+async function cancel({i18n, session, scene, replyWithMarkdown}) {
   session = {};
-  await scene.enter('text');
+  await scene.leave();
+  await replyWithMarkdown(i18n.t('help'));
 }
 
 export default Main;

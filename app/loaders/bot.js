@@ -11,7 +11,9 @@ bot.use(session());
 bot.use(i18n.middleware());
 bot.use(MainStage.middleware());
 
-bot.on('text', ({scene}) => scene.enter('text'));
+bot.on('text', ({scene, update}) => {
+  scene.enter('text', {text: update.message.text});
+});
 
 bot.catch((error) => logger.error('Telegraf Error:', error));
 
