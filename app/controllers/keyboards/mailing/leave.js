@@ -6,5 +6,4 @@ export default (i18n) => Markup.inlineKeyboard(
     [
       Markup.callbackButton(i18n.t('leave'), 'leave'),
     ],
-    {columns: 1},
 ).extra();

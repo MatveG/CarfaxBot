@@ -41,8 +41,7 @@ Main.command('admin', async ({scene}) => {
 
 Main.command('cancel', cancel);
 
-async function cancel({i18n, session, scene, replyWithMarkdown}) {
-  session = {};
+async function cancel({i18n, scene, replyWithMarkdown}) {
   await scene.leave();
   await replyWithMarkdown(i18n.t('help'));
 }
