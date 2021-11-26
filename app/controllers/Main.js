@@ -17,9 +17,9 @@ const Main = new Stage([
   TextScene,
 ]);
 
-Main.action(/ru|ua/g, async ({match, i18n, scene, replyWithMarkdown}) => {
+Main.action(/ru|ua/g, async ({match, i18n, scene, replyWithHTML}) => {
   i18n.locale(match[0]);
-  await replyWithMarkdown(i18n.t('help'));
+  await replyWithHTML(i18n.t('help'), { disable_web_page_preview: true });
   await scene.enter('text');
 });
 
@@ -41,9 +41,9 @@ Main.command('admin', async ({scene}) => {
 
 Main.command('cancel', cancel);
 
-async function cancel({i18n, scene, replyWithMarkdown}) {
+async function cancel({i18n, scene, replyWithHTML}) {
   await scene.leave();
-  await replyWithMarkdown(i18n.t('help'));
+  await replyWithHTML(i18n.t('help'), { disable_web_page_preview: true });
 }
 
 export default Main;
